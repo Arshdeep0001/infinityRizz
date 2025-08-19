@@ -1,0 +1,39 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: black
+ /* Prevents horizontal scroll */
+}
+
+
+@import "tailwindcss";
+.luxury-font {
+  font-family: "Raleway", sans-serif;
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Floating animation */
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+/* Example for form-input in your global CSS or apply directly in JSX */
+.form-input {
+  @apply w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
