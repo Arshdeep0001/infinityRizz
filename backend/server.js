@@ -18,9 +18,22 @@ connectDB();
 
 const app = express();
 
-// CORS configuration
+// CORS configuration for both local and deployed frontends
+const allowedOrigins = [
+    'http://localhost:5174',
+    'https://infinityrizz-1.onrender.com', // deployed frontend (adjust if needed)
+    'https://your-frontend-domain.com' // add your actual deployed frontend domain if different
+];
 const corsOptions = {
-    origin: 'http://localhost:5174',
+    origin: function (origin, callback) {
+        // allow requests with no origin (like mobile apps, curl, etc.)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        } else {
+            return callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
