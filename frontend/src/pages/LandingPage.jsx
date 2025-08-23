@@ -8,7 +8,9 @@ import { Link } from 'react-router-dom';
 import ScrollProgressIndicator from '../components/ScrollProgressIndicator'; // Import the new component
 
 // New FeaturedProductCard component - adapted from ProductList's ProductCard
+import { useCurrency } from '../context/CurrencyContext';
 const FeaturedProductCard = ({ product }) => {
+  const { currency } = useCurrency();
   const [currentImage, setCurrentImage] = useState(
     (product.images && product.images.length > 0) ? product.images[0] : 'https://via.placeholder.com/400x300.png?text=Product+Image'
   );
@@ -46,7 +48,10 @@ const FeaturedProductCard = ({ product }) => {
             <h3 className="text-xl font-bold text-white mb-2 leading-tight hover:text-orange-400 transition-colors duration-200">
               {product.name}
             </h3>
-            <p className="text-s text-white mb-4">${product.price ? product.price.toFixed(2) : 'N/A'}</p>
+            <p className="text-s text-white mb-4">
+              {currency.symbol}{product.price ? (product.price * currency.rate).toFixed(2) : 'N/A'}
+              <span className="ml-1 text-xs text-gray-400">{currency.code}</span>
+            </p>
           </div>
         </div>
       </div>

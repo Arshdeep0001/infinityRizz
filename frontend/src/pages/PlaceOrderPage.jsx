@@ -5,12 +5,14 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { useCurrency } from '../context/CurrencyContext';
 import API, { applyCoupon } from '../utils/api';
 
 const PlaceOrderPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
   const { cartItems, totalPrice, clearCart } = useCart();
+  const { currency } = useCurrency();
 
   // --- MODIFICATION: Move shipping address state here from ShippingPage ---
   const [address, setAddress] = useState('');
@@ -237,7 +239,8 @@ const PlaceOrderPage = () => {
                           <p className="text-gray-400 text-sm">Size: {item.selectedSize}</p>
                         )}
                         <p className="text-gray-300">
-                          {item.quantity} x ${item.price ? item.price.toFixed(2) : '0.00'} = ${(item.quantity * (item.price || 0)).toFixed(2)}
+                          {item.quantity} x {currency.symbol}{item.price ? (item.price * currency.rate).toFixed(2) : '0.00'} = {currency.symbol}{(item.quantity * (item.price || 0) * currency.rate).toFixed(2)}
+                          <span className="ml-1 text-xs text-gray-400">{currency.code}</span>
                         </p>
                       </div>
                     </li>
@@ -337,15 +340,15 @@ const PlaceOrderPage = () => {
               <div className="space-y-3 text-lg">
                 <div className="flex justify-between">
                   <span>Items:</span>
-                  <span className="font-semibold">${itemsPrice.toFixed(2)}</span>
+                  <span className="font-semibold">{currency.symbol}{(itemsPrice * currency.rate).toFixed(2)} <span className="ml-1 text-xs text-gray-400">{currency.code}</span></span>
                 </div>
                 <div className="flex justify-between">
                   <span>Shipping:</span>
-                  <span className="font-semibold">${shippingPrice.toFixed(2)}</span>
+                  <span className="font-semibold">{currency.symbol}{(shippingPrice * currency.rate).toFixed(2)} <span className="ml-1 text-xs text-gray-400">{currency.code}</span></span>
                 </div>
                 <div className="flex justify-between">
                   <span>Tax:</span>
-                  <span className="font-semibold">${taxPrice.toFixed(2)}</span>
+                  <span className="font-semibold">{currency.symbol}{(taxPrice * currency.rate).toFixed(2)} <span className="ml-1 text-xs text-gray-400">{currency.code}</span></span>
                 </div>
 
                 <div className="mt-4 pt-4 border-t border-gray-700">
@@ -377,14 +380,14 @@ const PlaceOrderPage = () => {
                   {appliedCoupon && (
                     <div className="flex justify-between text-green-400 mt-2">
                       <span>Discount ({appliedCoupon.code}):</span>
-                      <span className="font-semibold">-${appliedCoupon.discountAmount.toFixed(2)}</span>
+                      <span className="font-semibold">-{currency.symbol}{(appliedCoupon.discountAmount * currency.rate).toFixed(2)} <span className="ml-1 text-xs text-gray-400">{currency.code}</span></span>
                     </div>
                   )}
                 </div>
 
                 <div className="flex justify-between text-2xl font-bold border-t border-gray-600 pt-3 mt-3">
                   <span>Total:</span>
-                  <span className="text-orange-400">${finalTotalPrice.toFixed(2)}</span>
+                  <span className="text-orange-400">{currency.symbol}{(finalTotalPrice * currency.rate).toFixed(2)} <span className="ml-1 text-lg text-gray-400">{currency.code}</span></span>
                 </div>
               </div>
 

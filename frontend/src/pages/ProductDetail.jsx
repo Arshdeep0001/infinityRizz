@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { useCurrency } from '../context/CurrencyContext';
 import { useCart } from '../context/CartContext'; // Import useCart hook
 
 const ProductDetail = () => {
@@ -15,6 +16,7 @@ const ProductDetail = () => {
   const [showDescription, setShowDescription] = useState(false); // New state for toggling description visibility
 
   const { addToCart } = useCart(); // Get addToCart function from CartContext
+  const { currency } = useCurrency();
 
   // Hardcoded sizes for example. In a real app, these might come from product data or be fetched.
   const availableSizes = ['S', 'M', 'L', 'XL'];
@@ -141,7 +143,8 @@ const ProductDetail = () => {
                 {product.name}
               </h1>
               <p className="text-orange-400 text-4xl sm:text-5xl font-bold mb-6">
-                ${product.price ? product.price.toFixed(2) : 'N/A'}
+                {currency.symbol}{product.price ? (product.price * currency.rate).toFixed(2) : 'N/A'}
+                <span className="ml-2 text-lg text-gray-400">{currency.code}</span>
               </p>
               <p className="text-gray-300 text-lg mb-6">
                 Status:

@@ -4,9 +4,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useCart } from '../context/CartContext';
+import { useCurrency } from '../context/CurrencyContext';
 
 const CartPage = () => {
   const { cartItems, removeFromCart, updateQuantity, totalPrice, clearCart } = useCart();
+  const { currency } = useCurrency();
   const navigate = useNavigate();
 
   const handleQuantityChange = (productId, selectedSize, newQuantity, countInStock) => {
@@ -55,7 +57,10 @@ const CartPage = () => {
                       {item.selectedSize && (
                         <p className="text-gray-400 text-sm mt-1">Size: {item.selectedSize}</p>
                       )}
-                      <p className="text-orange-400 text-lg font-bold mt-2">${item.price.toFixed(2)}</p>
+                      <p className="text-orange-400 text-lg font-bold mt-2">
+                        {currency.symbol}{(item.price * currency.rate).toFixed(2)}
+                        <span className="ml-1 text-xs text-gray-400">{currency.code}</span>
+                      </p>
                     </div>
 
                     <div className="flex items-center mt-4 sm:mt-0 sm:ml-auto">
@@ -90,7 +95,10 @@ const CartPage = () => {
 
               <div className="flex justify-between items-center border-t border-gray-700 pt-6 mt-6">
                 <h3 className="text-2xl font-bold text-white">Total:</h3>
-                <span className="text-3xl font-bold text-orange-400">${totalPrice.toFixed(2)}</span>
+                <span className="text-3xl font-bold text-orange-400">
+                  {currency.symbol}{(totalPrice * currency.rate).toFixed(2)}
+                  <span className="ml-1 text-lg text-gray-400">{currency.code}</span>
+                </span>
               </div>
 
               <div className="mt-8 flex flex-col sm:flex-row gap-4">
