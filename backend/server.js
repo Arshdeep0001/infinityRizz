@@ -20,8 +20,8 @@ const app = express();
 
 // CORS configuration for both local and deployed frontends
 const allowedOrigins = [
-    'https://kl1c886l-5173.inc1.devtunnels.ms/',
-    'https://kl1c886l-5173.inc1.devtunnels.ms/', // deployed frontend (adjust if needed)
+    'http://localhost:5173',
+    'https://infinityrizz-1.onrender.com', // deployed frontend (adjust if needed)
     'https://your-frontend-domain.com' // add your actual deployed frontend domain if different
 ];
 const corsOptions = {
