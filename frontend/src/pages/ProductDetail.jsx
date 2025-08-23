@@ -22,7 +22,7 @@ const ProductDetail = () => {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetch(`http://localhost:5000/api/products/${id}`)
+    fetch(`https://infinityrizz-1.onrender.com/api/products/${id}`)
       .then((res) => {
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);

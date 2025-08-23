@@ -16,7 +16,6 @@ import PaymentPage from './pages/PaymentPage';
 import PlaceOrderPage from './pages/PlaceOrderPage';
 import OrderDetailsPage from './pages/OrderDetailsPage';
 import MyOrdersPage from './pages/MyOrdersPage';
-import PlaceholderPage from './pages/PlaceholderPage';
 import AdminOrderListPage from './pages/AdminOrderListPage';
 import AdminProductListPage from './pages/AdminProductListPage';
 import AdminProductEditPage from './pages/AdminProductEditPage';
@@ -50,7 +49,6 @@ function App() {
             <Route path="/placeorder" element={<PlaceOrderPage />} />
             <Route path="/order/:id" element={<OrderDetailsPage />} />
             <Route path="/myorders" element={<MyOrdersPage />} />
-            <Route path="/placeholder" element={<PlaceholderPage />} />
 
             {/* Admin Protected Routes */}
             <Route path="/admin" element={<AdminProtectedRoute />}>
