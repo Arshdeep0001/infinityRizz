@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useCurrency } from '../context/CurrencyContext';
-import InfinityRizzLogo from '../assets/infinity-rizz-logo1.png'; // Make sure this path is correct!
+import InfinityRizzLogo from '../assets/image.png'; // Make sure this path is correct!
 
 const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -29,15 +29,15 @@ const Navbar = () => {
         {/* Brand Logo */}
         <div className="flex-shrink-0"> {/* Added a div to control image size */}
           <Link to="/" onClick={closeMobileMenu}>
-            <img src={InfinityRizzLogo} alt="InfinityRizz Logo" className="h-3 w-auto" /> {/* Adjust h-10 as needed for your logo size */}
+            <img src={InfinityRizzLogo} alt="InfinityRizz Logo" className="h-10 w-auto" /> {/* Adjust h-10 as needed for your logo size */}
           </Link>
         </div>
         {/* Country/Currency Dropdown */}
-        <div className="mr-4">
+        <div>
           <select
             value={currency.code}
             onChange={e => changeCurrency(e.target.value)}
-            className="bg-black text-white border border-gray-600 p-2 rounded luxury-font"
+            className="bg-black text-white p-2 rounded luxury-font "
             aria-label="Select Country/Currency"
           >
             {currencyOptions.map(opt => (
