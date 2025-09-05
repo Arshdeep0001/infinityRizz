@@ -21,8 +21,7 @@ const app = express();
 // CORS configuration for both local and deployed frontends
 const allowedOrigins = [
     'http://localhost:5173',
-    'https://infinityrizz-1.onrender.com', // deployed frontend (adjust if needed)
-    'https://infinityrizz-2.onrender.com/' // add your actual deployed frontend domain if different
+    'https://infinityrizz-2.onrender.com' // your deployed frontend
 ];
 const corsOptions = {
     origin: function (origin, callback) {
