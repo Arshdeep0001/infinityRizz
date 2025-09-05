@@ -5,10 +5,12 @@ import { Link, useNavigate } from 'react-router-dom';
 // import Footer from '../components/Footer'; // Assuming Footer is globally rendered
 import { useAuth } from '../context/AuthContext';
 import { getAllProducts, deleteProduct } from '../utils/api'; // Import new API calls
+import { useCurrency } from '../context/CurrencyContext';
 
 const AdminProductListPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
+  const { currency } = useCurrency();
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -132,7 +134,11 @@ const AdminProductListPage = () => {
                     <tr key={product._id} className="border-b border-gray-700 last:border-b-0 hover:bg-gray-700 transition-colors duration-200">
                       <td className="py-4 px-4 text-gray-200 text-sm">{product._id}</td>
                       <td className="py-4 px-4 text-gray-200 text-sm">{product.name}</td>
-                      <td className="py-4 px-4 text-orange-400 font-bold text-sm">${product.price.toFixed(2)}</td>
+                      <td className="py-4 px-4 text-orange-400 font-bold text-sm">
+                        {currency.symbol}
+                        {typeof product.price === 'number' ? (product.price * currency.rate).toFixed(2) : 'N/A'}
+                        <span className="ml-1 text-xs text-gray-400">{currency.code}</span>
+                      </td>
                       <td className="py-4 px-4 text-gray-200 text-sm">{product.category}</td>
                       <td className="py-4 px-4 text-gray-200 text-sm">{product.brand}</td>
                       <td className="py-4 px-4 text-gray-200 text-sm">{product.countInStock}</td>

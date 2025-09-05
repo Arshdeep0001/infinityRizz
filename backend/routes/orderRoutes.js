@@ -17,7 +17,6 @@ const router = express.Router(); // Create an Express router
 // =============================================
 router.post(
     '/',
-    protect, // Only logged-in users can create orders
     asyncHandler(async (req, res) => {
         const {
             orderItems,
@@ -26,32 +25,37 @@ router.post(
             taxPrice,
             shippingPrice,
             totalPrice,
+            guestName,
+            guestMobileNumber,
         } = req.body;
 
-        // Basic validation: Check if orderItems exist and are not empty
         if (orderItems && orderItems.length === 0) {
             res.status(400);
             throw new Error('No order items');
         } else {
-            // Create a new order instance
-            const order = new Order({
-                user: req.user._id, // User ID comes from the 'protect' middleware
+            // If user is logged in, attach user; else, use guest info
+            let orderData = {
                 orderItems,
                 shippingAddress,
                 paymentMethod,
                 taxPrice,
                 shippingPrice,
                 totalPrice,
-            });
+            };
+            if (req.user && req.user._id) {
+                orderData.user = req.user._id;
+            } else {
+                orderData.guestName = guestName;
+                orderData.guestMobileNumber = guestMobileNumber;
+            }
 
-            // Save the order to the database
+            const order = new Order(orderData);
             const createdOrder = await order.save();
 
             // Update Product Stock (CRITICAL STEP)
             for (const item of orderItems) {
                 const product = await Product.findById(item.product);
                 if (product) {
-                    // Decrease stock count
                     product.countInStock -= item.qty;
                     await product.save();
                 } else {
@@ -59,7 +63,7 @@ router.post(
                 }
             }
 
-            res.status(201).json(createdOrder); // 201 Created
+            res.status(201).json(createdOrder);
         }
     })
 );
@@ -88,8 +92,8 @@ router.get(
     protect, // Must be logged in
     admin,   // Must be an admin
     asyncHandler(async (req, res) => {
-        // Find all orders and populate the 'user' field to get user name and email
-        const orders = await Order.find({}).populate('user', 'name email');
+    // Find all orders and populate the 'user' field to get user name and mobileNumber
+    const orders = await Order.find({}).populate('user', 'name mobileNumber');
         res.json(orders);
     })
 );
@@ -105,15 +109,26 @@ router.get(
     asyncHandler(async (req, res) => {
         const order = await Order.findById(req.params.id).populate(
             'user',
-            'name email'
+            'name mobileNumber'
         );
 
         if (order) {
-            if (order.user._id.toString() === req.user._id.toString() || req.user.isAdmin) {
-                res.json(order);
+            // If order has a user, check authorization as before
+            if (order.user) {
+                if (order.user._id.toString() === req.user._id.toString() || req.user.isAdmin) {
+                    res.json(order);
+                } else {
+                    res.status(401);
+                    throw new Error('Not authorized to view this order');
+                }
             } else {
-                res.status(401);
-                throw new Error('Not authorized to view this order');
+                // Guest order: allow access if admin or if guest info matches (optional: add more checks)
+                if (req.user.isAdmin) {
+                    res.json(order);
+                } else {
+                    res.status(401);
+                    throw new Error('Not authorized to view this guest order');
+                }
             }
         } else {
             res.status(404);

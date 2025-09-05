@@ -8,8 +8,16 @@ const orderSchema = mongoose.Schema(
     {
         user: {
             type: mongoose.Schema.Types.ObjectId,
-            required: true,
+            required: false, // Not required for guest checkout
             ref: 'User', // Reference to the User who placed the order
+        },
+        guestName: {
+            type: String,
+            required: false,
+        },
+        guestMobileNumber: {
+            type: String,
+            required: false,
         },
         orderItems: [
             {

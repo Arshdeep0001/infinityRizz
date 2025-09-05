@@ -93,10 +93,10 @@ const OrderDetailsPage = () => {
             <div className="lg:col-span-1 bg-gray-900 p-6  shadow-md border border-gray-700">
               <h3 className="text-2xl font-bold mb-4 text-white border-b border-gray-700 pb-3">Shipping</h3>
               <p className="text-gray-300 mb-2">
-                <strong>Name:</strong> {order.user.name}
+                <strong>Name:</strong> {order.user ? order.user.name : order.guestName}
               </p>
               <p className="text-gray-300 mb-2">
-                <strong>Email:</strong> <a href={`mailto:${order.user.email}`} className="text-blue-400 hover:underline">{order.user.email}</a>
+                <strong>Phone:</strong> {order.user ? (order.user.mobileNumber || 'N/A') : (order.guestMobileNumber || 'N/A')}
               </p>
               <p className="text-gray-300 mb-2">
                 <strong>Address:</strong> {order.shippingAddress.address}, {order.shippingAddress.city},{' '}

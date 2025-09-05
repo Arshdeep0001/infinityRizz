@@ -11,6 +11,8 @@ import API, { applyCoupon } from '../utils/api';
 const PlaceOrderPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
+  const [guestName, setGuestName] = useState('');
+  const [guestMobileNumber, setGuestMobileNumber] = useState('');
   const { cartItems, totalPrice, clearCart } = useCart();
   const { currency } = useCurrency();
 
@@ -45,34 +47,27 @@ const PlaceOrderPage = () => {
   }
 
   useEffect(() => {
-    // Redirect if not authenticated or cart is empty
-    if (!isAuthenticated) {
-      navigate('/login?redirect=/placeorder');
-    } else if (cartItems.length === 0) {
+    // Only redirect if cart is empty
+    if (cartItems.length === 0) {
       navigate('/cart');
     }
-
-    // --- MODIFICATION: Load shipping address and payment method from local storage on component mount ---
     try {
-        const savedShippingAddress = localStorage.getItem('shippingAddress');
-        const savedPaymentMethod = localStorage.getItem('paymentMethod');
-
-        if (savedShippingAddress) {
-            const parsedAddress = JSON.parse(savedShippingAddress);
-            setAddress(parsedAddress.address || '');
-            setCity(parsedAddress.city || '');
-            setPostalCode(parsedAddress.postalCode || '');
-            setCountry(parsedAddress.country || '');
-        }
-        if (savedPaymentMethod) {
-          setPaymentMethod(savedPaymentMethod);
-        }
-
-        const savedAppliedCoupon = sessionStorage.getItem('appliedCoupon');
-        if (savedAppliedCoupon) {
-          setAppliedCoupon(JSON.parse(savedAppliedCoupon));
-        }
-
+      const savedShippingAddress = localStorage.getItem('shippingAddress');
+      const savedPaymentMethod = localStorage.getItem('paymentMethod');
+      if (savedShippingAddress) {
+        const parsedAddress = JSON.parse(savedShippingAddress);
+        setAddress(parsedAddress.address || '');
+        setCity(parsedAddress.city || '');
+        setPostalCode(parsedAddress.postalCode || '');
+        setCountry(parsedAddress.country || '');
+      }
+      if (savedPaymentMethod) {
+        setPaymentMethod(savedPaymentMethod);
+      }
+      const savedAppliedCoupon = sessionStorage.getItem('appliedCoupon');
+      if (savedAppliedCoupon) {
+        setAppliedCoupon(JSON.parse(savedAppliedCoupon));
+      }
     } catch (e) {
       console.error("Failed to load checkout details from localStorage", e);
       setErrorMessage("Error loading checkout details. Please restart the process.");
@@ -81,7 +76,7 @@ const PlaceOrderPage = () => {
       sessionStorage.removeItem('appliedCoupon');
       navigate('/cart');
     }
-  }, [isAuthenticated, cartItems, navigate]);
+  }, [cartItems, navigate]);
 
 
   const handleApplyCoupon = async () => {
@@ -127,11 +122,11 @@ const PlaceOrderPage = () => {
     setOrderSuccess(null);
 
     // --- MODIFICATION: Check for address fields directly from state ---
-    if (!address || !city || !postalCode || !country || !paymentMethod || cartItems.length === 0) {
-        setErrorMessage("Please fill in all shipping and payment details.");
-        setLoading(false);
-        return;
-    }
+  if (!address || !city || !postalCode || !country || !paymentMethod || cartItems.length === 0 || !guestName || !guestMobileNumber) {
+    setErrorMessage("Please fill in all shipping, payment, and contact details.");
+    setLoading(false);
+    return;
+  }
 
     // Save shipping and payment method to local storage before placing order
     const shippingAddress = { address, city, postalCode, country };
@@ -159,6 +154,8 @@ const PlaceOrderPage = () => {
         totalPrice: parseFloat(finalTotalPrice.toFixed(2)),
         couponCode: appliedCoupon ? appliedCoupon.code : undefined,
         discountAmount: parseFloat(discountAmount.toFixed(2)),
+        guestName,
+        guestMobileNumber,
       };
 
       console.log("Order Data being sent:", orderData);
@@ -183,11 +180,12 @@ const PlaceOrderPage = () => {
   };
 
   // --- MODIFICATION: No loading state for missing shipping/payment anymore. User will see the form. ---
-  if (!isAuthenticated || cartItems.length === 0) {
+
+  if (cartItems.length === 0) {
     return (
       <div className="min-h-screen flex flex-col bg-black text-white justify-center items-center">
         <div className="flex-grow flex justify-center items-center text-gray-400 text-xl">
-          Please log in and add items to your cart.
+          Please add items to your cart.
         </div>
       </div>
     );
@@ -252,6 +250,37 @@ const PlaceOrderPage = () => {
               <div className="mt-8">
                 <h3 className="text-3xl font-bold mb-6 text-white border-b border-gray-700 pb-4">Shipping & Payment</h3>
                 <form onSubmit={placeOrderHandler}>
+                  <h4 className="text-xl font-bold mt-8 mb-4 text-white">Contact Details</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="mb-4">
+                      <label htmlFor="guestName" className="block text-gray-300 text-lg font-semibold mb-2 luxury-font">
+                        Name
+                      </label>
+                      <input
+                        type="text"
+                        id="guestName"
+                        className="w-full p-3 bg-gray-900 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 luxury-font"
+                        placeholder="Enter your name"
+                        value={guestName}
+                        onChange={e => setGuestName(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label htmlFor="guestMobileNumber" className="block text-gray-300 text-lg font-semibold mb-2 luxury-font">
+                        Mobile Number
+                      </label>
+                      <input
+                        type="text"
+                        id="guestMobileNumber"
+                        className="w-full p-3 bg-gray-900 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 luxury-font"
+                        placeholder="Enter your mobile number"
+                        value={guestMobileNumber}
+                        onChange={e => setGuestMobileNumber(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
                     <h4 className="text-xl font-bold mt-8 mb-4 text-white">Shipping Address</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="mb-4">
@@ -359,7 +388,7 @@ const PlaceOrderPage = () => {
                     <input
                       type="text"
                       id="couponCode"
-                      className="flex-grow px-1 p-2 bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="flex-grow px-1 py-2 w-full bg-gray-700 rounded-lg border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
                       placeholder="Enter coupon code"
                       value={couponCode}
                       onChange={(e) => setCouponCode(e.target.value)}
@@ -368,7 +397,7 @@ const PlaceOrderPage = () => {
                     <button
                       type="button"
                       onClick={handleApplyCoupon}
-                      className="bg-orange-500 text-white py-2 px-4 hover:bg-orange-600 transition-colors duration-200 flex-shrink-0"
+                      className="bg-orange-500 text-white rounded-lg0 py-2 px-1 hover:bg-orange-600 transition-colors duration-200 flex-shrink-0"
                       disabled={couponLoading}
                     >
                       {couponLoading ? 'Applying...' : 'Apply'}
